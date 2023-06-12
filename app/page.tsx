@@ -6,6 +6,7 @@ import InputForm from "@/components/form";
 import { DataTable } from "@/components/table/data_table";
 import { ColumnDef } from "@tanstack/react-table"
 import { useState, useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 const chargeData = async () => {
   const res = await fetch('/api/db_managment', {
@@ -18,13 +19,13 @@ export default function IndexPage() {
 
   const [result, setResult] = useState([{}]);         
   const [metadata, setMetada] = useState([{}]);         
-  const [loading, setLoading] = useState(false);  //booleano
+  const [loading, setLoading] = useState(false);
+  const [prompt, setPrompt] = useState("");
 
   
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
         const data = await chargeData();
         setResult(data.rows);
         setMetada(data.fields);
@@ -32,18 +33,22 @@ export default function IndexPage() {
       } catch (error) {
         console.error(error);
 
-      } finally {
-        setLoading(false);
       }
     };
-  
     fetchData();
   }, []);
+
+  useEffect(() => {
+      toast({
+        title: `${loading ? "Loading...":"Successful ✔"}`,
+        description: `Prompt: ${prompt}`,
+      })
+  }, [loading]);
   
   
   const generateRequest = async (requestData: { prompt: string }) => {
     setLoading(true);
-    console.log(requestData.prompt);
+    setPrompt(requestData.prompt);
     const res = await fetch('/api/requests', {
       method: "POST",
       headers: {
@@ -52,9 +57,7 @@ export default function IndexPage() {
       body: JSON.stringify(requestData),
     });
     const response = await res.json();     
-    //setResult('response.text');       //sacar comillas                   
-    console.log(response);
-    
+    setResult(response);
     if (res.ok) setLoading(false);
   }
   
@@ -72,7 +75,7 @@ export default function IndexPage() {
   return (
     <>
       <Title/>
-      <InputForm onSubmitRequest={generateRequest}/>
+      <InputForm onSubmitRequest={generateRequest} loading={loading}/>
       <DataTable columns={columns} data={result} loading={loading}/>
     </>
   )

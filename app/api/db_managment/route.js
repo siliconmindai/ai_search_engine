@@ -14,5 +14,7 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.error(error, { status: 500 });
+  } finally {
+    client.release();
   }
 }

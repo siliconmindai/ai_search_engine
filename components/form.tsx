@@ -8,7 +8,6 @@ import { formSchema } from "@/lib/validation";
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
 import {
   Form,
   FormControl,
@@ -20,7 +19,8 @@ import {
 
 
 interface InputFormProps {
-  onSubmitRequest: (data: { prompt: string }) => void;
+  onSubmitRequest: (data: { prompt: string }) => void,
+  loading: boolean,
 }
 
 
@@ -31,6 +31,7 @@ export default function InputForm(props: InputFormProps) {
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     props.onSubmitRequest(data);
+    form.setValue('prompt', '');
   }
 
   return (
@@ -50,9 +51,12 @@ export default function InputForm(props: InputFormProps) {
               </FormItem>
             )}
           />
-          <Button type="submit">Search</Button>
+          <Button type="submit" disabled={props.loading}>
+            {props.loading ? "Searching":"Search"}
+            </Button>
         </form>
       </Form>
     </div>
   )
 }
+

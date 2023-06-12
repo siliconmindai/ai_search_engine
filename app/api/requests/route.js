@@ -1,5 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import { NextResponse } from "next/server";
+import { db } from "@vercel/postgres";
 
 const openai_api_key = process.env.OPENAI_API_KEY;
 
@@ -15,6 +16,7 @@ const openai = new OpenAIApi(configuration);
 
 export async function POST(request) {  
   const body = await request.json();      //body: {prompt: string}
+  const client = await db.connect();
   try {
     
     const response = await openai.createCompletion({
@@ -33,10 +35,13 @@ SELECT *`,
     });
 
     const sql_prompt = await response.data.choices[0].text;
+    const {rows} = await client.query(`SELECT * ${sql_prompt}`);
 
-    return NextResponse.json(sql_prompt);
+    return NextResponse.json(rows);
   } catch (error) {
     return NextResponse.error(error, { status: 500 });
+  } finally {
+    client.release();
   }
 }
 
