@@ -7,16 +7,11 @@ import { DataTable } from "@/components/table/data_table";
 import { ColumnDef } from "@tanstack/react-table"
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
+import {chargeData} from "@/lib/dataAPI"
 
-const chargeData = async () => {
-  const res = await fetch('/api/db_managment', {
-    method: "GET",
-  });
-  return await res.json(); 
-}
 
-export default function IndexPage() {
-
+function IndexPage() {
+  
   const [result, setResult] = useState([{}]);         
   const [metadata, setMetada] = useState([{}]);         
   const [loading, setLoading] = useState(false);
@@ -62,15 +57,16 @@ export default function IndexPage() {
   }
   
   //Columns .tsx
-  type ColumnsType = typeof result[0];
+  type ColumnsType = typeof result[0] extends undefined | null ? {} : typeof result[0];
 
-  const columns: ColumnDef<ColumnsType>[] = Object.keys(result[0]).map((key) => {
+  const columns: ColumnDef<ColumnsType>[] = (result[0] ? Object.keys(result[0]) : []).map((key) => {
     const capitalizedKey = key.replace(/_/g, " ").replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
     return {
       accessorKey: key,
       header: capitalizedKey,
     };
   });
+
 
   return (
     <>
@@ -80,3 +76,5 @@ export default function IndexPage() {
     </>
   )
 }
+
+export default IndexPage

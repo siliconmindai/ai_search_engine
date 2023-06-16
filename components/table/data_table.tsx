@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 
+//table imports
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -23,7 +24,20 @@ import {
 } from "@/components/ui/table"
 
 import { DataTablePagination } from "./data_table_pagination"
+
+//Form imports
 import { Input } from "@/components/ui/input"
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -54,18 +68,37 @@ export function DataTable<TData, TValue>({
       columnFilters,
     }
   })
+  const [filter, setFilter] = React.useState("first_name");
 
+  //Corregir el filtrado por numeros
   return (
     <div className="container">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by last name..."
-          value={(table.getColumn("last_name")?.getFilterValue() as string) ?? ""}
+          placeholder={`Filter by ${filter}`}
+          value={(table.getColumn(filter)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("last_name")?.setFilterValue(event.target.value)
+            table.getColumn(filter)?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
+
+        <Select value={filter} onValueChange={(value) => setFilter(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a fruit" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Fields</SelectLabel>
+              {
+                columns.map((column) => <SelectItem value={column.accessorKey}>
+                  {column.header}
+                </SelectItem>)
+              }
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
       </div>
       <div className="rounded-md border">
         <Table>

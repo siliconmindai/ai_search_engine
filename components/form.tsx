@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { formSchema } from "@/lib/validation";
-
+import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -54,6 +54,10 @@ export default function InputForm(props: InputFormProps) {
           <Button type="submit" disabled={props.loading}>
             {props.loading ? "Searching":"Search"}
             </Button>
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="picture">Upload your .csv file</Label>
+            <Input id="csv" type="file" />
+          </div>
         </form>
       </Form>
     </div>
